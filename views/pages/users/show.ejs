@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../../partials/header', { title: title }) %>
+    <script type="application/javascript">
+    function deleteUser(id) {
+      fetch('/users/' + id, { method: 'DELETE' })
+        .then(function (res) {
+          location.href = '/users';
+        })
+        .catch(function (err) {
+          console.log('nok', err);
+        });
+    }
+    </script>
+  </head>
+  <body>
+    <%- include('../../partials/top', { active: active }) %>
+    <div class="content">
+      <h3>User:</h3>
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td class="col-xs-1"><strong>Id</strong></td>
+            <td><%= user._id %></td>
+          </tr>
+          <tr>
+            <td class="col-xs-1"><strong>E-mail</strong></td>
+            <td><%= user.email %></td>
+          </tr>
+          <tr>
+            <td class="col-xs-1"><strong>Phone</strong></td>
+            <td><%= user.phone %></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <button class="btn btn-danger pull-right" onclick="deleteUser('<%= user._id %>')">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <a href="/users">List all users</a>
+    </div>
+  </body>
+</html>

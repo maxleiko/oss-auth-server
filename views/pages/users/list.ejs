@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <%- include('../../partials/header', { title: title }) %>
+</head>
+
+<body>
+  <%- include('../../partials/top', { active: active }) %>
+    <div class="content">
+      <h3>Users:</h3>
+      <div class="list-group">
+        <% users.forEach(function (user) { %>
+          <a href="/users/<%= user._id %>" class="list-group-item">
+            <h4 class="list-group-item-heading"><%= user.email %></h4>
+            <p class="list-group-item-text">
+              <%= user.phone %>
+            </p>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+</body>
+
+</html>

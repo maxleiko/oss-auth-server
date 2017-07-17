@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../../partials/header', { title: title }) %>
+  </head>
+  <body>
+    <%- include('../../partials/top', { active: active }) %>
+    <div class="content">
+      <h3>User creation:</h3>
+      <p>User <strong><%= user.email %></strong> created successfuly</p>
+      <a href="/users">List all users</a>
+    </div>
+  </body>
+</html>
