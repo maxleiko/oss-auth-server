@@ -5,11 +5,11 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 
 
 /* GET home page. */
-router.get('/',   passport.authenticate('basic', { session: false }),
+router.get('/admin',   passport.authenticate('basic', { session: false }),
 (req, res) => {
   res.render('pages/index', {
     title: 'Home - OSS Auth Server',
-    active: 'home'
+    active: 'admin'
   });
 });
 
