@@ -1,4 +1,5 @@
 const express = require('express');
+const passport = require('passport');
 const router = express.Router();
 const debug = require('debug')('oss-auth-server:users');
 
@@ -9,7 +10,8 @@ const secretService = require('../lib/secret-service');
 const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT || 3000);
 
 /* GET user by id */
-router.get('/:id', (req, res) => {
+router.get('/:id',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).get(req.params.id)
     .then((user) => {
       res.render('pages/users/show', {
@@ -21,7 +23,8 @@ router.get('/:id', (req, res) => {
 });
 
 /* GET users listing. */
-router.get('/', (req, res) => {
+router.get('/',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).getAll()
     .then((users) => {
       res.render('pages/users/index', {
@@ -34,7 +37,7 @@ router.get('/', (req, res) => {
 });
 
 /* POST create new user */
-router.post('/', (req, res) => {
+router.post('/',  passport.authenticate('basic', { session: false }), (req, res) => {
   userService(req.db).create(req.body.email, req.body.phone)
     .then((user) => {
       return secretService(req.db).create(req.body.email)
@@ -67,7 +70,8 @@ router.post('/', (req, res) => {
 });
 
 /* DELETE user */
-router.delete('/:id', (req, res) => {
+router.delete('/:id',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).remove(req.params.id)
     .then(() => {
       res.sendStatus(200);

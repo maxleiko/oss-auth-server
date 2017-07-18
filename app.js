@@ -4,6 +4,16 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const initMongoDb = require('./lib/init-mongodb');
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
+
+passport.use(new BasicStrategy((userid, password, done) => {
+  if (userid === 'admin' && password === 'admin') {
+    return done(null, true);
+  } else {
+    return done(null, false);
+  }
+}));
 
 const index = require('./routes/index');
 const users = require('./routes/users');
