@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
 
 const userService = require('../lib/user-service');
 
 /* GET user by id */
-router.get('/:id', (req, res) => {
+router.get('/:id',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).get(req.params.id)
     .then((user) => {
       console.log("ID:", req.params.id);
@@ -18,7 +21,8 @@ router.get('/:id', (req, res) => {
 });
 
 /* GET users listing. */
-router.get('/', (req, res) => {
+router.get('/',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).getAll()
     .then((users) => {
       res.render('pages/users/list', {
@@ -30,7 +34,8 @@ router.get('/', (req, res) => {
 });
 
 /* POST create new user */
-router.post('/', (req, res) => {
+router.post('/',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).create(req.body.email, req.body.phone)
     .then((user) => {
       res.status(201).render('pages/users/created', {
@@ -42,7 +47,8 @@ router.post('/', (req, res) => {
 });
 
 /* DELETE user */
-router.delete('/:id', (req, res) => {
+router.delete('/:id',  passport.authenticate('basic', { session: false }),
+(req, res) => {
   userService(req.db).remove(req.params.id)
     .then(() => {
       res.sendStatus(200);
