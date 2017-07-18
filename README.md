@@ -4,8 +4,10 @@ oss-auth-server
 ## Features:
  - [x] CR-D on users
  - [x] Saved in MongoDB
- - [ ] Unicity of phone/e-mail
- - [ ] Send e-mail to new users
+ - [x] Unicity of e-mail
+ - [x] Send e-mail to new users with Google Authenticator secret
+ - [x] Validate Google Authenticator token against secret
+ - [ ] .htaccess for /users
 
 ## Clone project
 ```sh

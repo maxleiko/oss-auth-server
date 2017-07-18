@@ -8,7 +8,7 @@ const appInit = require('../app');
 const debug = require('debug')('oss-auth-server:server');
 const http = require('http');
 
-appInit((app) => {
+appInit.then((app) => {
   /**
    * Get port from environment and store in Express.
    */

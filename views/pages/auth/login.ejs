@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../../partials/header', { title: title }) %>
+  </head>
+  <body>
+    <%- include('../../partials/top', { active: active }) %>
+    <div class="container-fluid">
+      <h3>Login:</h3>
+      <% if (success) {%>
+        <p>
+          Hello <strong><%= user.email %></strong>,
+          <br/><br/>
+          You are successfully logged-in.
+        </p>
+      <% } else { %>
+        <p>
+          Login failed.
+        </p>
+      <% }%>
+    </div>
+  </body>
+</html>
