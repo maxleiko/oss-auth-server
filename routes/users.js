@@ -6,6 +6,10 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 const userService = require('../lib/user-service');
 const nodemailer = require('nodemailer');
 
+const speakeasy = require('speakeasy');
+const QRCode = require('qrcode');
+
+
 // create reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
     host: 'smtp.inria.fr',
@@ -49,23 +53,33 @@ router.get('/',  passport.authenticate('basic', { session: false }),
 /* POST create new user */
 router.post('/',  passport.authenticate('basic', { session: false }),
 (req, res) => {
-  userService(req.db).create(req.body.email, req.body.phone)
+  var secret = speakeasy.generateSecret({length: 20});
+  console.log(secret.base32); // secret of length 20
+
+  QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+    console.log(data_url); // get QR code data URL
+
+  });
+
+  userService(req.db).create(req.body.email, req.body.phone, secret.base32 )
     .then((user) => {
       // setup email data with unicode symbols
-      let mailOptions = {
-          from: '"Olivier Barais" <barais@irisa.fr>', // sender address
-          to: 'olivier.barais@irisa.fr', // list of receivers
-          subject: 'Hello ✔', // Subject line
-          text: 'Hello world ?', // plain text body
-          html: '<b>Hello world ?</b>' // html body
-      };
+      QRCode.toDataURL(secret.otpauth_url, function(err, data_url) {
+        let mailOptions = {
+            from: '"Olivier Barais" <barais@irisa.fr>', // sender address
+            to: req.body.email, // list of receivers
+            subject: 'Your access to OSS Web Site', // Subject line
+            html: '<b>Hello, if you want to access the OSS web site, please scan the following QR code available at this <a href="'+data_url+ '">URL</a> using <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr">google authentificator</a>. Next you can access the web site directly <a href="http://localhost:3000">here</a> and use the app to authentificate</b>' // html body
+        };
 
-      // send mail with defined transport object
-      transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-              return console.log(error);
-          }
-          console.log('Message %s sent: %s', info.messageId, info.response);
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message %s sent: %s', info.messageId, info.response);
+        });
+
       });
 
       res.status(201).render('pages/users/created', {
