@@ -3,6 +3,17 @@
 
 <head>
   <%- include('../../partials/header', { title: title }) %>
+  <script type="application/javascript">
+  function deleteUsers() {
+    fetch('/users', { method: 'DELETE' })
+      .then(function (res) {
+        location.href = '/users';
+      })
+      .catch(function (err) {
+        console.log('nok', err);
+      });
+  }
+  </script>
 </head>
 
 <body>
@@ -38,18 +49,20 @@
               <tr>
                 <th>E-mail</th>
                 <th>Phone</th>
-                <th></th>
+                <th>Secret</th>
+                <th class="text-right"><button class="btn btn-xs btn-danger" onclick="deleteUsers()">Delete all</button></th>
               </tr>
             </thead>
             <% users.forEach(function (user) { %>
               <tr>
                 <td><%= user.email %></td>
                 <td><%= user.phone %></td>
+                <td><%= user.secret %></td>
                 <td class="text-right"><a href="/users/<%= user._id %>">Show</a></td>
               </tr>
             <% }); %>
             <% if (users.length === 0) { %>
-              <tr><td colspan="2"><em>- none -</em></td></tr>
+              <tr><td colspan="3" class="text-center"><em>- empty -</em></td></tr>
             <% } %>
           </table>
         </div>

@@ -1,31 +1,30 @@
 const express = require('express');
-const passport = require('passport');
 const router = express.Router();
 const debug = require('debug')('oss-auth-server:users');
 
-const userService = require('../lib/user-service');
 const mailService = require('../lib/mail-service');
 const secretService = require('../lib/secret-service');
+const User = require('../model/User');
+const Secret = require('../model/Secret');
 
 const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT || 3000);
 
 /* GET user by id */
-router.get('/:id',  passport.authenticate('basic', { session: false }),
-(req, res) => {
-  userService(req.db).get(req.params.id)
+router.get('/:id', (req, res, next) => {
+  User.findOne({ _id: req.params.id })
     .then((user) => {
       res.render('pages/users/show', {
         title: 'User - OSS Auth Server',
         active: 'users',
         user: user,
       });
-    });
+    })
+    .catch(next);
 });
 
 /* GET users listing. */
-router.get('/',  passport.authenticate('basic', { session: false }),
-(req, res) => {
-  userService(req.db).getAll()
+router.get('/', (req, res, next) => {
+  User.find()
     .then((users) => {
       res.render('pages/users/index', {
         title: 'Users - OSS Auth Server',
@@ -33,22 +32,24 @@ router.get('/',  passport.authenticate('basic', { session: false }),
         users: users,
         error: null
       });
-    });
+    })
+    .catch(next);
 });
 
 /* POST create new user */
-router.post('/',  passport.authenticate('basic', { session: false }), (req, res) => {
-  userService(req.db).create(req.body.email, req.body.phone)
-    .then((user) => {
-      return secretService(req.db).create(req.body.email)
-        .then((secret) => {
-          const expirationDate = new Date();
-          expirationDate.setHours(expirationDate.getHours() + 24);
-          return mailService(baseUrl).send(user.email, '/auth/qrcode?secret=' + secret.base32, expirationDate)
-            .then(() => user);
-        });
+router.post('/', (req, res, next) => {
+  const key = secretService().create();
+  const user = new User({ email: req.body.email, phone: req.body.phone });
+  user.save()
+    .then(() => {
+      const secret = new Secret({ email: user.email, key: key });
+      return secret.save();
     })
-    .then((user) => {
+    .then((secret) => {
+      secret.creationDate.setHours(secret.creationDate.getHours() + 24);
+      return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + secret._id, secret.creationDate);
+    })
+    .then(() => {
       res.status(201).render('pages/users/created', {
         title: 'Users - OSS Auth Server',
         active: 'users',
@@ -57,7 +58,7 @@ router.post('/',  passport.authenticate('basic', { session: false }), (req, res)
     })
     .catch((err) => {
       debug(err);
-      userService(req.db).getAll()
+      User.find()
         .then((users) => {
           res.status(400).render('pages/users/index', {
             title: 'Users - OSS Auth Server',
@@ -66,16 +67,26 @@ router.post('/',  passport.authenticate('basic', { session: false }), (req, res)
             error: err.message
           });
         });
-    });
+    })
+    .catch(next);
 });
 
 /* DELETE user */
-router.delete('/:id',  passport.authenticate('basic', { session: false }),
-(req, res) => {
-  userService(req.db).remove(req.params.id)
+router.delete('/:id', (req, res, next) => {
+  User.remove({ _id: req.params.id })
     .then(() => {
       res.sendStatus(200);
-    });
+    })
+    .catch(next);
+});
+
+/* DELETE all users */
+router.delete('/', (req, res, next) => {
+  User.remove()
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch(next);
 });
 
 module.exports = router;

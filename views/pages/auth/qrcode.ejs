@@ -7,8 +7,12 @@
     <%- include('../../partials/top', { active: active }) %>
     <div class="container-fluid">
       <h3>Google Authenticator QR code:</h3>
-      <img class="qrcode" src="<%= qrcode %>" />
-      I have my code, let me <a href="/">log in</a>.
+      <% if (unknown) { %>
+        <p class="text-danger">Unknown id <strong><%= id %></strong></p>
+      <% } else { %>
+        <img class="qrcode" src="<%= qrcode %>" />
+        I have my code, let me <a href="/">log in</a>.
+      <% } %>
     </div>
   </body>
 </html>

@@ -1,23 +1,19 @@
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const bodyParser = require('body-parser');
-const initMongoDb = require('./lib/init-mongodb');
 const passport = require('passport');
-const BasicStrategy = require('passport-http').BasicStrategy;
 
-passport.use(new BasicStrategy((userid, password, done) => {
-  if (userid === 'admin' && password === 'admin') {
-    return done(null, true);
-  } else {
-    return done(null, false);
-  }
-}));
+const initMongoDb = require('./lib/init-mongodb');
 
 const index = require('./routes/index');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
+
+const strategy = require('./lib/passport-strategy');
+
+const User = require('./model/User');
 
 const app = express();
 
@@ -30,13 +26,30 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'awesome secret',
+  saveUninitialized: true,
+  resave: false,
+  cookie: { maxAge: 60 * 1000 * 15 }
+})); // 15 minutes
+app.use(passport.initialize());
+app.use(passport.session());
+//
+passport.use(strategy);
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done) => {
+  console.log('deserializeUser', id);
+  User.findOne({ _id: id }, done);
+});
 
 const promise = initMongoDb(app).then(() => {
-  app.use('/', index);
-  app.use('/users', users);
   app.use('/auth', auth);
+  app.use('/', passport.authenticate('custom', { failureRedirect: '/auth/login' }), index);
+  app.use('/users', passport.authenticate('custom', { failureRedirect: '/auth/login' }), users);
 
   // catch 404 and forward to error handler
   app.use((req, res, next) => {

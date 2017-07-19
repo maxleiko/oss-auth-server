@@ -6,18 +6,29 @@
   <body>
     <%- include('../../partials/top', { active: active }) %>
     <div class="container-fluid">
-      <h3>Login:</h3>
-      <% if (success) {%>
-        <p>
-          Hello <strong><%= user.email %></strong>,
-          <br/><br/>
-          You are successfully logged-in.
-        </p>
-      <% } else { %>
-        <p>
-          Login failed.
-        </p>
-      <% }%>
+      <div class="col-sm-offset-4 col-sm-4">
+        <div class="text-center">
+          <h3>Login</h3>
+          <% if (error) {%>
+              <p class="text-danger">Error: <%= error %></p>
+          <% } %>
+        </div>
+        <form class="col-sm-offset-3 col-sm-6" action="/auth/login" method="post">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" class="form-control" name="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="token">Verification code</label>
+            <input type="text" class="form-control" name="token" />
+          </div>
+
+          <div class="col-xs-12 text-center">
+            <button type="submit" class="btn btn-sm">Login</button>
+          </div>
+        </form>
+      </div>
     </div>
   </body>
 </html>
