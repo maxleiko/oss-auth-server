@@ -5,10 +5,10 @@ const passport = require('passport');
 const secretService = require('../lib/secret-service');
 
 const Secret = require('../model/Secret');
-const TemporaryURLSecretMappingSchema = require('../model/TemporaryURLSecretMappingSchema');
+const TemporaryURLSecretMapping = require('../model/TemporaryURLSecretMapping');
 
 router.get('/qrcode', (req, res, next) => {
-  TemporaryURLSecretMappingSchema.findOne({ urlkey: req.query.id })
+  TemporaryURLSecretMapping.findOne({ urlkey: req.query.id })
     .then((mapping) => {
       if (mapping) {
         return secretService().qrcode(mapping.key)

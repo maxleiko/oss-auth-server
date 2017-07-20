@@ -7,7 +7,7 @@ const mailService = require('../lib/mail-service');
 const secretService = require('../lib/secret-service');
 const User = require('../model/User');
 const Secret = require('../model/Secret');
-const TemporaryURLSecretMappingSchema = require('../model/TemporaryURLSecretMappingSchema');
+const TemporaryURLSecretMapping = require('../model/TemporaryURLSecretMapping');
 const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT || 3000);
 
 /* GET user by id */
@@ -58,7 +58,7 @@ router.post('/', (req, res, next) => {
       const secret = new Secret({ email: user.email, key: key });
       return secret.save();
     }).then((secret) => {
-        const mapping = new TemporaryURLSecretMappingSchema({urlkey:crypto.randomBytes(24).toString('hex'),key:key});
+        const mapping = new TemporaryURLSecretMapping({urlkey:crypto.randomBytes(24).toString('hex'),key:key});
         mapping.save();
     })
     .then((mapping) => {

@@ -6,6 +6,6 @@ const TemporaryURLSecretMappingSchema = mongoose.Schema({
   creationDate: { type: Date, default: Date.now(), expires: 60 * 60 * 24 } // TTL 24 hours
 });
 
-SecretSchema.index({ urlkey: 1 });
+TemporaryURLSecretMappingSchema.index({ urlkey: 1 });
 
 module.exports = mongoose.model('TemporaryURLSecretMapping', TemporaryURLSecretMappingSchema);
