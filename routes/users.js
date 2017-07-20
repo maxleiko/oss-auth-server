@@ -59,11 +59,11 @@ router.post('/', (req, res, next) => {
       return secret.save();
     }).then((secret) => {
         const mapping = new TemporaryURLSecretMapping({urlkey:crypto.randomBytes(24).toString('hex'),key:key});
-        mapping.save();
+        return mapping.save();
     })
     .then((mapping) => {
       mapping.creationDate.setHours(mapping.creationDate.getHours() + 24);
-      return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + mapping.urlkey, secret.creationDate);
+      return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + mapping.urlkey, mapping.creationDate);
     })
     .then(() => {
       res.status(201).render('pages/users/created', {
