@@ -57,13 +57,13 @@ router.post('/', (req, res, next) => {
     .then(() => {
       const secret = new Secret({ email: user.email, key: key });
       return secret.save();
-    })
-    .then((secret) => {
-      secret.creationDate.setHours(secret.creationDate.getHours() + 24);
-      return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + secret._id, secret.creationDate);
     }).then((secret) => {
         const mapping = new TemporaryURLSecretMappingSchema({urlkey:crypto.randomBytes(24).toString('hex'),key:key});
         mapping.save();
+    })
+    .then((mapping) => {
+      mapping.creationDate.setHours(mapping.creationDate.getHours() + 24);
+      return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + mapping.urlkey, secret.creationDate);
     })
     .then(() => {
       res.status(201).render('pages/users/created', {

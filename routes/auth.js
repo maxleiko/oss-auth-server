@@ -5,12 +5,13 @@ const passport = require('passport');
 const secretService = require('../lib/secret-service');
 
 const Secret = require('../model/Secret');
+const TemporaryURLSecretMappingSchema = require('../model/TemporaryURLSecretMappingSchema');
 
 router.get('/qrcode', (req, res, next) => {
-  Secret.findOne({ _id: req.query.id })
-    .then((secret) => {
-      if (secret) {
-        return secretService().qrcode(secret.key)
+  TemporaryURLSecretMappingSchema.findOne({ urlkey: req.query.id })
+    .then((mapping) => {
+      if (mapping) {
+        return secretService().qrcode(mapping.key)
           .then((dataURL) => {
             res.render('pages/auth/qrcode', {
               title: 'QRCode - OSS Auth Server',
