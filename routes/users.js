@@ -12,7 +12,7 @@ const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT 
 
 /* GET user by id */
 router.get('/:id', (req, res, next) => {
-  if (req.user.admin){
+  if (process.env.NONADMIN ||req.user.admin){
   User.findOne({ _id: req.params.id })
     .then((user) => {
       res.render('pages/users/show', {
@@ -31,7 +31,7 @@ router.get('/:id', (req, res, next) => {
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
-  if (req.user.admin){
+  if (process.env.NONADMIN ||req.user.admin){
   User.find()
     .then((users) => {
       res.render('pages/users/index', {
@@ -50,7 +50,7 @@ router.get('/', (req, res, next) => {
 
 /* POST create new user */
 router.post('/', (req, res, next) => {
-  if (req.user.admin){
+  if (process.env.NONADMIN || req.user.admin){
   const key = secretService().create();
   const user = new User({ email: req.body.email, phone: req.body.phone, admin: req.body.admin });
   user.save()
@@ -94,7 +94,7 @@ router.post('/', (req, res, next) => {
 
 /* DELETE user */
 router.delete('/:id', (req, res, next) => {
-  if (req.user.admin){
+  if (process.env.NONADMIN || req.user.admin){
   User.findOne({ _id: req.params.id }).then((user1) => {
     Secret.remove({ email: user1.email}).then(() => {
         User.remove({ _id: req.params.id }).then(() => {
@@ -111,7 +111,7 @@ router.delete('/:id', (req, res, next) => {
 
 /* DELETE all users and all sectets */
 router.delete('/', (req, res, next) => {
-  if (req.user.admin){
+  if (process.env.NONADMIN || req.user.admin){
   Secret.remove().then(() => {
     User.remove()
       .then(() => {
