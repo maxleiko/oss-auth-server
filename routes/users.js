@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const debug = require('debug')('oss-auth-server:users');
+const crypto = require('crypto');
 
 const mailService = require('../lib/mail-service');
 const secretService = require('../lib/secret-service');
 const User = require('../model/User');
 const Secret = require('../model/Secret');
-
+const TemporaryURLSecretMappingSchema = require('../model/TemporaryURLSecretMappingSchema');
 const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT || 3000);
 
 /* GET user by id */
@@ -60,6 +61,9 @@ router.post('/', (req, res, next) => {
     .then((secret) => {
       secret.creationDate.setHours(secret.creationDate.getHours() + 24);
       return mailService(baseUrl).send(user.email, '/auth/qrcode?id=' + secret._id, secret.creationDate);
+    }).then((secret) => {
+        const mapping = new TemporaryURLSecretMappingSchema({urlkey:crypto.randomBytes(24).toString('hex'),key:key});
+        mapping.save();
     })
     .then(() => {
       res.status(201).render('pages/users/created', {
