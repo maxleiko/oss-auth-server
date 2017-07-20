@@ -95,12 +95,13 @@ router.post('/', (req, res, next) => {
 /* DELETE user */
 router.delete('/:id', (req, res, next) => {
   if (req.user.admin){
-  //TODO Delete also the secret for this user
-  User.remove({ _id: req.params.id })
-    .then(() => {
-      res.sendStatus(200);
-    })
-    .catch(next);
+  User.findOne({ _id: req.params.id }).then((user1) => {
+    Secret.remove({ email: user1.email}).then(() => {
+        User.remove({ _id: req.params.id }).then(() => {
+            res.sendStatus(200);
+          }).catch(next);
+        }).catch(next);
+      }).catch(next);
   }
   else{
     res.sendStatus(403);
