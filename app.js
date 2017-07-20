@@ -48,7 +48,7 @@ passport.deserializeUser((id, done) => {
 
 const promise = initMongoDb(app).then(() => {
   app.use('/auth', auth);
-  app.use('/', passport.authenticate('custom', { failureRedirect: '/auth/login' }), index);
+  app.use('/', passport.authenticate('custom', { failureRedirect: '/auth/login' }), express.static(path.join(__dirname, 'private')));
   app.use('/users', passport.authenticate('custom', { failureRedirect: '/auth/login' }), users);
 
   // catch 404 and forward to error handler
