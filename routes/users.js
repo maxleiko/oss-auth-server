@@ -11,6 +11,7 @@ const baseUrl = process.env.BASE_URL || 'http://localhost:' + (process.env.PORT 
 
 /* GET user by id */
 router.get('/:id', (req, res, next) => {
+  if (req.user.admin){
   User.findOne({ _id: req.params.id })
     .then((user) => {
       res.render('pages/users/show', {
@@ -20,10 +21,16 @@ router.get('/:id', (req, res, next) => {
       });
     })
     .catch(next);
+  }
+  else{
+    res.sendStatus(403);
+  }
+
 });
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
+  if (req.user.admin){
   User.find()
     .then((users) => {
       res.render('pages/users/index', {
@@ -34,12 +41,17 @@ router.get('/', (req, res, next) => {
       });
     })
     .catch(next);
+    }
+    else{
+      res.sendStatus(403);
+    }
 });
 
 /* POST create new user */
 router.post('/', (req, res, next) => {
+  if (req.user.admin){
   const key = secretService().create();
-  const user = new User({ email: req.body.email, phone: req.body.phone });
+  const user = new User({ email: req.body.email, phone: req.body.phone, admin: req.body.admin });
   user.save()
     .then(() => {
       const secret = new Secret({ email: user.email, key: key });
@@ -69,24 +81,44 @@ router.post('/', (req, res, next) => {
         });
     })
     .catch(next);
+  }
+  else{
+    res.sendStatus(403);
+  }
+
 });
 
 /* DELETE user */
 router.delete('/:id', (req, res, next) => {
+  if (req.user.admin){
+  //TODO Delete also the secret for this user
   User.remove({ _id: req.params.id })
     .then(() => {
       res.sendStatus(200);
     })
     .catch(next);
+  }
+  else{
+    res.sendStatus(403);
+  }
+
 });
 
-/* DELETE all users */
+/* DELETE all users and all sectets */
 router.delete('/', (req, res, next) => {
-  User.remove()
-    .then(() => {
-      res.sendStatus(200);
-    })
-    .catch(next);
+  if (req.user.admin){
+  Secret.remove().then(() => {
+    User.remove()
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch(next);
+  }).catch(next);
+}
+else{
+  res.sendStatus(403);
+}
+
 });
 
 module.exports = router;
