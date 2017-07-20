@@ -27,7 +27,7 @@ docker run -d -p 27017:27017 mongo:3.4.6
 ## Start the server in dev mode
 ```sh
 DEBUG=oss-auth-server:* npm start
-# MAIL_USER=barais MAIL_PASS=****** MAIL_HOST=smtp.inria.fr MAIL_PORT=587  DEBUG=oss-auth-server:* node ./bin/www
+# MAIL_USER=barais MAIL_PASS=****** MAIL_HOST=smtp.inria.fr MAIL_PORT=587 MAIL_SENDER=olivier.barais@inria.fr  DEBUG=oss-auth-server:* node ./bin/www
 ```
 
 
