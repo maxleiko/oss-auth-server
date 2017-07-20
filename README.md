@@ -7,7 +7,6 @@ oss-auth-server
  - [x] Unicity of e-mail
  - [x] Send e-mail to new users with Google Authenticator secret
  - [x] Validate Google Authenticator token against secret
- - [ ] .htaccess for /users
 
 ## Clone project
 ```sh
@@ -28,6 +27,7 @@ docker run -d -p 27017:27017 mongo:3.4.6
 ## Start the server in dev mode
 ```sh
 DEBUG=oss-auth-server:* npm start
+# MAIL_USER=barais MAIL_PASS=****** MAIL_HOST=smtp.inria.fr MAIL_PORT=587  DEBUG=oss-auth-server:* node ./bin/www 
 ```
 
 
