@@ -5,13 +5,21 @@
   <%- include('../../partials/header', { title: title }) %>
   <script type="application/javascript">
   function deleteUsers() {
-    fetch('/users', { method: 'DELETE' })
+    /*fetch('/users', { method: 'DELETE' })
       .then(function (res) {
         location.href = '/users';
       })
       .catch(function (err) {
         console.log('nok', err);
-      });
+      });*/
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', '/users');
+      xhr.onreadystatechange = function() { // listen for state changes
+        if (xhr.readyState == 4 && xhr.status == 200) { // when completed we can move away
+          window.location = "/users/";
+        }
+      }
+      xhr.send(null);
   }
   </script>
 </head>
