@@ -29,3 +29,19 @@ docker run -d -p 27017:27017 mongo:3.4.6
 ```sh
 DEBUG=oss-auth-server:* npm start
 ```
+
+
+## Export users
+```sh
+mongoexport  --db oss-auth-server --collection secrets --out secrets.json
+mongoexport  --db oss-auth-server --collection users --out users.json
+```
+
+
+## Import users
+```sh
+mongoimport  --db oss-auth-server --collection secrets --file secrets.json
+mongoexport  --db oss-auth-server --collection users --file users.json
+```
+
+
